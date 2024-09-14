@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpEventType } from '@angular/common/http';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpEventType} from '@angular/common/http';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'file-uploader',
   templateUrl: './file-uploader.component.html',
   styleUrls: ['./file-uploader.component.scss'],
@@ -12,9 +14,15 @@ export class FileUploaderComponent implements OnInit {
   @Input() method: string = 'POST';
   @Input() payload: any = {};
   @Input() onBeforeUpload?: () => void;
-  @Input() onSuccess?: (response: any) => void;
-  @Input() onFailure?: (response: any) => void;
-  @Input() onComplete?: () => void;
+  // @Input() onSuccess?: (response: any) => void;
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  @Output() onSuccess = new EventEmitter<any>();
+  // @Input() onFailure?: (response: any) => void;
+  // @Input() onComplete?: () => void;
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  @Output() onFailure = new EventEmitter<any>();
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  @Output() onComplete = new EventEmitter<void>();
   @Input() isUploading: boolean = false;
   @Input() isReady: boolean = false;
   @Input() showName: boolean = true;
@@ -35,17 +43,20 @@ export class FileUploaderComponent implements OnInit {
   selectedFiles: any[] = [];
 
   ACCEPTED_TYPES = {
-    document: { extensions: ['pdf', 'ps'], icon: 'fa-file-pdf-o', name: 'PDF' },
-    csv: { extensions: ['csv', 'xls', 'xlsx'], icon: 'fa-file-excel-o', name: 'CSV' },
-    image: { extensions: ['png', 'bmp', 'tiff', 'jpeg', 'jpg', 'gif'], icon: 'fa-file-image-o', name: 'image' },
-    zip: { extensions: ['zip', 'tar.gz', 'tar'], icon: 'fa-file-zip-o', name: 'archive' }
+    document: {extensions: ['pdf', 'ps'], icon: 'fa-file-pdf-o', name: 'PDF'},
+    csv: {extensions: ['csv', 'xls', 'xlsx'], icon: 'fa-file-excel-o', name: 'CSV'},
+    image: {
+      extensions: ['png', 'bmp', 'tiff', 'jpeg', 'jpg', 'gif'],
+      icon: 'fa-file-image-o',
+      name: 'image',
+    },
+    zip: {extensions: ['zip', 'tar.gz', 'tar'], icon: 'fa-file-zip-o', name: 'archive'},
   };
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-  console.log("djbfekjrbf",this.files)  
-  if (!this.files || typeof this.files !== 'object') {
+    if (!this.files || typeof this.files !== 'object') {
       this.files = {};
     }
     this.createUploadZones(this.files);
@@ -54,13 +65,12 @@ export class FileUploaderComponent implements OnInit {
     }
   }
   onFileDrop(event: DragEvent): void {
-    console.log("efw",event)
     event.preventDefault();
     event.stopPropagation();
     const files = Array.from(event.dataTransfer!.files);
     this.handleFiles(files);
   }
-  handleFiles(files: File[]) {
+  handleFiles(_files: File[]) {
     throw new Error('Method not implemented.');
   }
 
@@ -83,8 +93,8 @@ export class FileUploaderComponent implements OnInit {
           name: uploadData.name,
           icon: typeData.icon,
           type: typeData.name,
-          error: false
-        }
+          error: false,
+        },
       };
     });
 
@@ -108,13 +118,19 @@ export class FileUploaderComponent implements OnInit {
 
   refreshShownUploadZones(): void {
     if (this.singleDropZone) {
-      const firstEmptyZone = this.uploadZones.find((zone) => !zone.model || zone.model.length === 0);
+      const firstEmptyZone = this.uploadZones.find(
+        (zone) => !zone.model || zone.model.length === 0,
+      );
       this.shownUploadZones = firstEmptyZone ? [firstEmptyZone] : [];
     }
   }
 
   modelChanged(newFiles: any[], upload: any): void {
     if (newFiles.length > 0 || upload.rejects?.length > 0) {
+      // upload.model = Array.from(newFiles);
+      // upload.model = newFiles;
+      const input = event.target as HTMLInputElement;
+      upload.model = Array.from(input.files);
       const gotError = this.checkForError(upload);
       if (!gotError) {
         this.filesSelected = this.uploadZones.map((zone) => zone.model).flat();
@@ -127,7 +143,6 @@ export class FileUploaderComponent implements OnInit {
   }
 
   checkForError(upload: any): boolean {
-    console.log("a1")
     if (upload.rejects?.length > 0) {
       upload.display.error = true;
       setTimeout(() => (upload.display.error = false), 4000);
@@ -137,15 +152,10 @@ export class FileUploaderComponent implements OnInit {
   }
 
   readyToUpload(): boolean {
-    // console.log("hjefbgejhr")
-    this.isReady = this.uploadZones.every((upload) =>{
-      console.log("dcds",upload)
-       !!upload.model});
-    return true;
+    return this.uploadZones.every((zone) => zone.model && zone.model.length > 0);
   }
 
   initiateFileUpload(): void {
-    console.log("dfb",this.uploadZones, this.readyToUpload)
     if (!this.readyToUpload()) {
       return;
     }
@@ -165,23 +175,29 @@ export class FileUploaderComponent implements OnInit {
       formData.append(key, value);
     }
 
-    this.uploadingInfo = { progress: 5, success: null, error: null, complete: false };
+    this.uploadingInfo = {progress: 5, success: null, error: null, complete: false};
     this.isUploading = true;
 
-    const headers = new HttpHeaders({ 'Auth-Token': 'auth-token', 'Username': 'username' });
+    const headers = new HttpHeaders({'Auth-Token': 'auth-token', 'Username': 'username'});
 
-    this.http.post(this.url, formData, { headers, observe: 'events', reportProgress: true })
+    this.http
+      .post(this.url, formData, {
+        headers,
+        observe: 'events',
+        reportProgress: true,
+        responseType: 'json',
+      })
       .subscribe({
         next: (event) => {
           if (event.type === HttpEventType.UploadProgress) {
-            const progress = Math.round(100 * event.loaded / (event.total || 1));
+            const progress = Math.round((100 * event.loaded) / (event.total || 1));
             this.uploadingInfo.progress = progress;
           } else if (event.type === HttpEventType.Response) {
             this.uploadingInfo.complete = true;
             this.uploadingInfo.success = true;
-            this.onSuccess?.(event.body);
+            this.onSuccess.emit(event.body);
             setTimeout(() => {
-              this.onComplete?.();
+              this.onComplete.emit();
               if (this.resetAfterUpload) {
                 this.resetUploader();
               }
@@ -192,7 +208,7 @@ export class FileUploaderComponent implements OnInit {
           this.uploadingInfo.complete = true;
           this.uploadingInfo.success = false;
           this.uploadingInfo.error = error.error || 'Unknown error';
-          this.onFailure?.(error);
+          this.onFailure.emit(error.message);
         }
       });
   }
