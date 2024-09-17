@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Injectable} from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {CsvUploadModalComponent} from './csv-upload-modal.component';
 
-interface BatchFile {
+export interface BatchFile {
+  file: File;
+}
+
+export interface File {
   name: string;
-  size: number;
+  size?: number;
   type?: string;
 }
 
@@ -23,19 +28,19 @@ export class CsvUploadModalService {
   public show(
     title: string,
     message: string,
-    batchFiles: BatchFile[] = [],
+    batchFiles: any,
     url: string,
-    onSuccess: (response: Response) => void
+    onSuccess: (response: Response) => void,
   ): void {
-
     const validBatchFiles: BatchFile[] = batchFiles ?? [];
 
     const dialogRef: MatDialogRef<CsvUploadModalComponent, any> = this.dialog.open(
       CsvUploadModalComponent,
       {
         data: {title, message, batchFiles: validBatchFiles, url, onSuccess},
-      width: '600px',
+        width: '600px',
         panelClass: 'csv-upload-modal',
-    });
+      },
+    );
   }
 }

@@ -7,6 +7,10 @@
     table-layout: fixed;
   }
 
+  .mat-dialog-actions {
+    justify-content: flex-end;
+   }
+
   table th.message { width: 20%; }
   table th.data    { width: 80%; }
 

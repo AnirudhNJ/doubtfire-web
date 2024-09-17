@@ -7,9 +7,13 @@
     </h3>
   </div>
   <div mat-dialog-content class="modal-body clearfix">
-    <file-uploader files="batchFiles" url="url" nSuccess="wrapSuccess($event)"></file-uploader>
+    <file-uploader
+      [files]="batchFiles"
+      [url]="url"
+      (nSuccess)="wrapSuccess($event)"
+    ></file-uploader>
   </div>
-  <div mat-dialog-actions class="modal-footer clearfix">
+  <div mat-dialog-actions style="justify-content: flex-end">
     <button mat-button class="btn btn-primary pull-right" (click)="close()">Done</button>
   </div>
 </div>

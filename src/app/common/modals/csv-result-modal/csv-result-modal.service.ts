@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Injectable} from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {CsvResultModalComponent} from './csv-result-modal.component';
@@ -14,7 +15,7 @@ interface CsvResponse {
 export class CsvResultModalService {
   constructor(
     private dialog: MatDialog,
-    private alertService: AlertService
+    private alertService: AlertService,
   ) {}
 
   public show(title: string, response: CsvResponse): void {
@@ -27,7 +28,7 @@ export class CsvResultModalService {
     } else if (successLength > 0) {
       this.alertService.message(
         `Data uploaded, success with ${successLength} items, but ${errorsLength} errors.`,
-        6000
+        6000,
       );
     } else {
       this.alertService.error(`Data uploaded but ${errorsLength} errors`, 6000);
@@ -39,7 +40,8 @@ export class CsvResultModalService {
       {
         data: {title, response},
         width: '600px',
-      panelClass: 'csv-result-modal',
-    });
+        panelClass: 'csv-result-modal',
+      },
+    );
   }
 }

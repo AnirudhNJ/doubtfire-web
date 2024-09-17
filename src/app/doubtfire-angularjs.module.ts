@@ -492,7 +492,6 @@ DoubtfireAngularJSModule.directive(
 );
 DoubtfireAngularJSModule.directive('newFUnits', downgradeComponent({component: FUnitsComponent}));
 
-
 // Global configuration
 
 // If the user enters a URL that doesn't match any known URL (state), send them to `/home`

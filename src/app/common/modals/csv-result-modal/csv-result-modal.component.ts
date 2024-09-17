@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {csvUploadModalService, csvResultModalService} from './../../../ajs-upgraded-providers';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'csv-result-modal',
   templateUrl: './csv-result-modal.component.html',
   styleUrls: ['./csv-result-modal.component.scss'],
@@ -19,8 +20,6 @@ export class CsvResultModalComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<CsvResultModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    @Inject(csvUploadModalService) private csvUploadModal: any,
-    @Inject(csvResultModalService) private csvResultModal: any,
   ) {
     this.title = data.title;
     this.response = data.response;
