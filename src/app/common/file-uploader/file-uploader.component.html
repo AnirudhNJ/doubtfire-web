@@ -1,4 +1,10 @@
-<div class="file-uploader" [ngClass]="{'is-uploading': isUploading}">
+<div
+  class="file-uploader"
+  [ngClass]="{'is-uploading': isUploading}"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onFileDrop($event)"
+>
   <!-- Begin Upload Button -->
   <div *ngIf="!showUploader">
     <button class="btn btn-success form-control" (click)="showUploader = true">
@@ -25,7 +31,6 @@
         <input
           type="file"
           [accept]="upload.accept"
-          accept="image/*"
           (ngModelChange)="modelChanged($event, upload)"
           [ngModel]="upload.model"
           hidden
