@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpEventType } from '@angular/common/http';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpEventType} from '@angular/common/http';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'file-uploader',
   templateUrl: './file-uploader.component.html',
   styleUrls: ['./file-uploader.component.scss'],
@@ -11,13 +13,18 @@ export class FileUploaderComponent implements OnInit {
   @Input() url: string = '';
   @Input() method: string = 'POST';
   @Input() payload: any = {};
-  @Input() onBeforeUpload?: () => void;
+  // @Input() onBeforeUpload?: () => void;
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  @Output() onBeforeUpload? = new EventEmitter<any>();
   // @Input() onSuccess?: (response: any) => void;
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   @Output() onSuccess = new EventEmitter<any>();
   // @Input() onFailure?: (response: any) => void;
   // @Input() onComplete?: () => void;
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   @Output() onFailure = new EventEmitter<any>();
- @Output() onComplete = new EventEmitter<void>();
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  @Output() onComplete = new EventEmitter<void>();
   @Input() isUploading: boolean = false;
   @Input() isReady: boolean = false;
   @Input() showName: boolean = true;
@@ -38,18 +45,24 @@ export class FileUploaderComponent implements OnInit {
   selectedFiles: any[] = [];
 
   ACCEPTED_TYPES = {
-    document: { extensions: ['pdf', 'ps'], icon: 'fa-file-pdf-o', name: 'PDF' },
-    csv: { extensions: ['csv', 'xls', 'xlsx'], icon: 'fa-file-excel-o', name: 'CSV' },
-    image: { extensions: ['png', 'bmp', 'tiff', 'jpeg', 'jpg', 'gif'], icon: 'fa-file-image-o', name: 'image' },
-    zip: { extensions: ['zip', 'tar.gz', 'tar'], icon: 'fa-file-zip-o', name: 'archive' }
+    document: {extensions: ['pdf', 'ps'], icon: 'fa-file-pdf-o', name: 'PDF'},
+    csv: {extensions: ['csv', 'xls', 'xlsx'], icon: 'fa-file-excel-o', name: 'CSV'},
+    image: {
+      extensions: ['png', 'bmp', 'tiff', 'jpeg', 'jpg', 'gif'],
+      icon: 'fa-file-image-o',
+      name: 'image',
+    },
+    zip: {extensions: ['zip', 'tar.gz', 'tar'], icon: 'fa-file-zip-o', name: 'archive'},
   };
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-  if (!this.files || typeof this.files !== 'object') {
+    console.log('t5gkt', this.uploadZones);
+    if (!this.files || typeof this.files !== 'object') {
       this.files = {};
     }
+    console.log('t5gkt', this.files);
     this.createUploadZones(this.files);
     if (!this.onClickFailureCancel) {
       this.onClickFailureCancel = this.resetUploader.bind(this);
@@ -61,8 +74,32 @@ export class FileUploaderComponent implements OnInit {
     const files = Array.from(event.dataTransfer!.files);
     this.handleFiles(files);
   }
-  handleFiles(files: File[]) {
-    throw new Error('Method not implemented.');
+  // handleFiles(_files: File[]) {
+  //   throw new Error('Method not implemented.');
+  // }
+  handleFiles(files: File[]): void {
+    files.forEach((file) => {
+      this.uploadZones.forEach((zone) => {
+        const extensions = zone.accept.split(',').map((ext) => ext.trim());
+        if (extensions.some((ext) => file.name.endsWith(ext))) {
+          zone.model = [file];
+          this.refreshShownUploadZones();
+        } else {
+          zone.rejects = [file];
+          this.checkForError(zone);
+        }
+      });
+    });
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   createUploadZones(files: any): void {
@@ -84,8 +121,8 @@ export class FileUploaderComponent implements OnInit {
           name: uploadData.name,
           icon: typeData.icon,
           type: typeData.name,
-          error: false
-        }
+          error: false,
+        },
       };
     });
 
@@ -97,7 +134,7 @@ export class FileUploaderComponent implements OnInit {
     this.isUploading = false;
     this.showUploader = !this.asButton;
 
-    for (let upload of this.uploadZones) {
+    for (const upload of this.uploadZones) {
       this.clearEnqueuedUpload(upload);
     }
   }
@@ -151,14 +188,14 @@ export class FileUploaderComponent implements OnInit {
       return;
     }
 
-    this.onBeforeUpload?.();
+    this.onBeforeUpload?.emit();
 
     const formData = new FormData();
-    for (let zone of this.uploadZones) {
+    for (const zone of this.uploadZones) {
       formData.append(zone.name, zone.model[0]);
     }
 
-    for (let key in this.payload) {
+    for (const key in this.payload) {
       let value = this.payload[key];
       if (typeof value === 'object') {
         value = JSON.stringify(value);
@@ -200,7 +237,7 @@ export class FileUploaderComponent implements OnInit {
           this.uploadingInfo.success = false;
           this.uploadingInfo.error = error.error || 'Unknown error';
           this.onFailure.emit(error.message);
-        }
+        },
       });
   }
 
